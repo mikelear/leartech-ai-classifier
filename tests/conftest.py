@@ -34,6 +34,6 @@ def good_diff() -> str:
     """A code diff that should PASS (proper Angular patterns)."""
     return (
         "+ import { HttpClient } from '@angular/common/http';\n"
-        "+ constructor(private http: HttpClient) {}\n"
+        '+ constructor(private http: HttpClient) {}\n'
         "+ this.http.get('/api/settings').subscribe(data => {});\n"
     )

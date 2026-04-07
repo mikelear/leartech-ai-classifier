@@ -1,8 +1,9 @@
 """FastAPI application — PASS/FAIL code review classifier."""
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import Any
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field

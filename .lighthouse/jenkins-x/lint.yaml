@@ -25,7 +25,8 @@ spec:
           name: python-lint-format
           resources:
             requests:
-              cpu: 200m
+              cpu: 500m
+              memory: 1Gi
               memory: 512Mi
           script: |
             #!/bin/sh

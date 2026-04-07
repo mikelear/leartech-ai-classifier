@@ -1,0 +1,5 @@
+# Gitleaks config — exclude test files with intentional fake secrets
+[allowlist]
+paths = [
+    '''tests/.*''',
+]
