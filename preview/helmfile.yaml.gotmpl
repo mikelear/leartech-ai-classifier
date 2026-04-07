@@ -1,0 +1,11 @@
+environments:
+  default:
+    values:
+    - jx-values.yaml
+---
+releases:
+- chart: ../charts/leartech-ai-classifier
+  name: preview
+  values:
+  - values.yaml.gotmpl
+  - jx-values.yaml
