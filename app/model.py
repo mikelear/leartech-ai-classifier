@@ -46,8 +46,7 @@ class ModelService:
         if not path.exists():
             raise FileNotFoundError(f'Model file not found: {self.model_path}')
 
-        # nosemgrep: python.pytorch.security.pickles-in-pytorch — model file is local/trusted, not user-supplied
-        checkpoint = torch.load(self.model_path, map_location='cpu', weights_only=False)
+        checkpoint = torch.load(self.model_path, map_location='cpu', weights_only=False)  # nosemgrep: pickles-in-pytorch
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.model.eval()
 
