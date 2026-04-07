@@ -6,7 +6,7 @@ from typing import Any
 import torch
 import torch.nn as nn
 
-from app.features import NUM_FEATURES, FEATURE_NAMES, extract_features
+from app.features import FEATURE_NAMES, NUM_FEATURES, extract_features
 
 
 class CodeClassifier(nn.Module):
@@ -27,7 +27,8 @@ class CodeClassifier(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass — features in, probability out."""
-        return self.net(x)
+        result: torch.Tensor = self.net(x)
+        return result
 
 
 class ModelService:
@@ -45,6 +46,7 @@ class ModelService:
         if not path.exists():
             raise FileNotFoundError(f'Model file not found: {self.model_path}')
 
+        # nosemgrep: python.pytorch.security.pickles-in-pytorch — model file is local/trusted, not user-supplied
         checkpoint = torch.load(self.model_path, map_location='cpu', weights_only=False)
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.model.eval()
@@ -77,10 +79,7 @@ class ModelService:
         verdict = 'FAIL' if probability > 0.5 else 'PASS'
         confidence = probability if probability > 0.5 else 1 - probability
 
-        feature_values = {
-            name: features[i].item()
-            for i, name in enumerate(FEATURE_NAMES)
-        }
+        feature_values = {name: features[i].item() for i, name in enumerate(FEATURE_NAMES)}
 
         return {
             'verdict': verdict,

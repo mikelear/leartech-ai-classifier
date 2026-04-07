@@ -1,0 +1,11 @@
+# Gitleaks config — exclude test fixtures with intentional fake secrets
+[[rules]]
+id = "test-fixtures"
+description = "Exclude test data with fake secrets"
+path = '''tests/.*'''
+
+[rules.allowlist]
+paths = [
+    '''tests/conftest\.py''',
+    '''tests/test_data/.*''',
+]

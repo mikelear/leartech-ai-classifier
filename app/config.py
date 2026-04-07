@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     """Configuration loaded from environment variables."""
 
     model_path: str = 'models/code_classifier.pt'
-    host: str = '0.0.0.0'
+    host: str = '0.0.0.0'  # noqa: S104
     port: int = 8080
     log_level: str = 'info'
 
