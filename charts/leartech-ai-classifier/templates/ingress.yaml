@@ -1,0 +1,27 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "leartech-ai-classifier.fullname" . }}
+  labels:
+    {{- include "leartech-ai-classifier.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.ingress.host | default (printf "%s-%s.%s" (include "leartech-ai-classifier.fullname" .) .Release.Namespace .Values.jxRequirements.ingress.domain) }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "leartech-ai-classifier.fullname" . }}
+            port:
+              number: {{ .Values.service.port }}
+  tls:
+  - secretName: {{ .Values.ingress.tlsSecretName | default "tls-jx-leartech-com" }}
+    hosts:
+    - {{ .Values.ingress.host | default (printf "%s-%s.%s" (include "leartech-ai-classifier.fullname" .) .Release.Namespace .Values.jxRequirements.ingress.domain) }}
+{{- end }}
