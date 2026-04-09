@@ -18,5 +18,4 @@ htmlcov/
 # OS
 .DS_Store
 
-# UV
-uv.lock
+# UV lock file tracked — pins exact dependency versions for reproducible builds
