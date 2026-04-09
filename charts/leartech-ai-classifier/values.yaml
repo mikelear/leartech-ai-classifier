@@ -37,6 +37,11 @@ autoscaling:
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
 
+ingress:
+  enabled: true
+  host: ""
+  tlsSecretName: ""
+
 jxRequirements:
   ingress:
     domain: ""
