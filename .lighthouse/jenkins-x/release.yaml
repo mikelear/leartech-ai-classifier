@@ -92,7 +92,12 @@ spec:
           resources: {}
         - name: promote-jx-promote
           resources: {}
-  podTemplate: {}
+  podTemplate:
+    tolerations:
+    - key: sku
+      operator: Equal
+      value: build
+      effect: NoSchedule
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
 status: {}

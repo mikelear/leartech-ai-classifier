@@ -41,7 +41,12 @@ spec:
 
             echo "=== Mypy Type Check ==="
             uv run mypy app
-  podTemplate: {}
+  podTemplate:
+    tolerations:
+    - key: sku
+      operator: Equal
+      value: build
+      effect: NoSchedule
   serviceAccountName: tekton-bot
   timeout: 30m0s
 status: {}
