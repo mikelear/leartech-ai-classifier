@@ -1,14 +1,11 @@
 replicaCount: 1
-
 image:
-  repository: ""
-  tag: ""
+  repository: "us-central1-docker.pkg.dev/product-first/oci/leartech-ai-classifier"
+  tag: "0.3.0"
   pullPolicy: IfNotPresent
-
 service:
   type: ClusterIP
   port: 8080
-
 resources:
   requests:
     cpu: 100m
@@ -16,32 +13,27 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
-
 livenessProbe:
   httpGet:
     path: /health
     port: 8080
   initialDelaySeconds: 10
   periodSeconds: 30
-
 readinessProbe:
   httpGet:
     path: /health
     port: 8080
   initialDelaySeconds: 5
   periodSeconds: 10
-
 autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
-
 ingress:
   enabled: true
   host: ""
   tlsSecretName: ""
-
 jxRequirements:
   ingress:
     domain: ""
