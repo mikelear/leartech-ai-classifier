@@ -26,7 +26,7 @@ def test_predict_endpoint(bad_diff: str) -> None:
         assert 0 <= data['confidence'] <= 1
         assert 0 <= data['probability'] <= 1
         assert 'features' in data
-        assert len(data['features']) == 16
+        assert len(data['features']) >= 16  # v1=16, v5=234
 
 
 def test_predict_empty_diff() -> None:
@@ -51,7 +51,7 @@ def test_model_info_endpoint() -> None:
         data = response.json()
         assert data['parameters'] > 0
         assert data['training_examples'] > 0
-        assert len(data['feature_names']) == 16
+        assert len(data['feature_names']) >= 16  # v1=16, v5=34+
 
 
 def test_openapi_docs() -> None:

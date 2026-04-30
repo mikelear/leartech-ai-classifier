@@ -39,10 +39,24 @@ app = FastAPI(
 )
 
 
+class PipelineSignals(BaseModel):
+    """Optional pipeline signals for enhanced prediction."""
+
+    services_affected: int = 1
+    touches_critical: float = 0.0
+    unexpected_edges: int = 0
+    coverage_gaps: int = 0
+    e2e_passed: float = 1.0
+    leartech_violations: int = 0
+
+
 class PredictRequest(BaseModel):
     """Request body for the predict endpoint."""
 
     diff: str = Field(..., description='The code diff to classify')
+    pipeline_signals: PipelineSignals | None = Field(
+        None, description='Optional pipeline signals (risk-assessor, e2e, semgrep)',
+    )
 
 
 class PredictResponse(BaseModel):
@@ -104,7 +118,8 @@ async def predict(request: PredictRequest) -> dict[str, Any]:
             'probability': 0.0,
             'features': {},
         }
-    return model_service.predict(request.diff)
+    signals = request.pipeline_signals.model_dump() if request.pipeline_signals else None
+    return model_service.predict(request.diff, pipeline_signals=signals)
 
 
 @app.get('/model/info', response_model=ModelInfoResponse)
