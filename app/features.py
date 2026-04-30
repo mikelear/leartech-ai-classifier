@@ -1,6 +1,6 @@
 """Feature extraction from code diffs — turns text into a tensor."""
 
-import pickle
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -90,26 +90,56 @@ _scaler: StandardScaler | None = None
 _num_features: int = NUM_HANDCRAFTED
 
 
+def _load_tfidf_from_json(path: Path) -> TfidfVectorizer | None:
+    """Reconstruct TfidfVectorizer from JSON params (no pickle)."""
+    if not path.exists():
+        return None
+    with open(path) as f:
+        params = json.load(f)
+    tfidf = TfidfVectorizer(
+        analyzer=params.get('analyzer', 'char_wb'),
+        ngram_range=tuple(params['ngram_range']),
+        max_features=params.get('max_features'),
+        sublinear_tf=params.get('sublinear_tf', True),
+    )
+    tfidf.vocabulary_ = params['vocabulary']
+    tfidf.idf_ = np.array(params['idf'])
+    # Reconstruct internal state needed for transform()
+    tfidf._tfidf._idf_diag = None  # forces recompute from idf_
+    return tfidf
+
+
+def _load_scaler_from_json(path: Path) -> StandardScaler | None:
+    """Reconstruct StandardScaler from JSON params (no pickle)."""
+    if not path.exists():
+        return None
+    with open(path) as f:
+        params = json.load(f)
+    scaler = StandardScaler()
+    scaler.mean_ = np.array(params['mean'])
+    scaler.scale_ = np.array(params['scale'])
+    scaler.var_ = np.array(params['var'])
+    scaler.n_features_in_ = params['n_features_in']
+    scaler.n_samples_seen_ = params.get('n_samples_seen', 1)
+    return scaler
+
+
 def load_artefacts(models_dir: str = 'models') -> None:
     """Load TF-IDF vectorizer and scaler from the models directory.
 
     Called once at startup. If artefacts don't exist, the service
     falls back to hand-crafted features only (v1 behaviour).
+
+    Artefacts are stored as JSON (not pickle) to avoid deserialization
+    security concerns. The JSON files contain only the numerical params
+    needed to reconstruct the sklearn objects.
     """
     global _tfidf, _scaler, _num_features, NUM_FEATURES  # noqa: PLW0603
 
     models_path = Path(models_dir)
 
-    tfidf_path = models_path / 'tfidf_char.pkl'
-    scaler_path = models_path / 'scaler.pkl'
-
-    if tfidf_path.exists():
-        with open(tfidf_path, 'rb') as f:
-            _tfidf = pickle.load(f)  # nosemgrep: pickles-in-pytorch  # noqa: S301
-
-    if scaler_path.exists():
-        with open(scaler_path, 'rb') as f:
-            _scaler = pickle.load(f)  # nosemgrep: pickles-in-pytorch  # noqa: S301
+    _tfidf = _load_tfidf_from_json(models_path / 'tfidf_char.json')
+    _scaler = _load_scaler_from_json(models_path / 'scaler.json')
 
     if _tfidf is not None:
         _num_features = NUM_HANDCRAFTED + len(_tfidf.get_feature_names_out())
