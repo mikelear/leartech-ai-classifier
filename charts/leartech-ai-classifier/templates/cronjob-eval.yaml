@@ -1,0 +1,53 @@
+{{- if .Values.eval.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: classifier-eval
+  labels:
+    app.kubernetes.io/name: {{ include "leartech-ai-classifier.name" . }}
+    app.kubernetes.io/component: eval
+spec:
+  schedule: {{ .Values.eval.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: {{ include "leartech-ai-classifier.name" . }}
+            app.kubernetes.io/component: eval
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: eval
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command: ["python", "app/cron_eval.py"]
+            args:
+            - --endpoint
+            - {{ .Values.eval.classifierEndpoint | quote }}
+            - --repo
+            - "mikelear/leartech-llm-training-data"
+            - --accuracy-floor
+            - {{ .Values.eval.accuracyFloor | quote }}
+            - --cluster-id
+            - "gcp"
+            env:
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.eval.github.secretName }}
+                  key: password
+                  optional: true
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+{{- end }}
