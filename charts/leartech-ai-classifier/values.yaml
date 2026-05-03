@@ -42,6 +42,22 @@ ingress:
   host: ""
   tlsSecretName: ""
 
+eval:
+  enabled: true
+  schedule: "0 6 * * *"  # Daily 6am UTC
+  classifierEndpoint: "http://leartech-ai-classifier:8080"
+  feedbackRepo: "https://github.com/mikelear/leartech-llm-training-data.git"
+  accuracyFloor: 0.8
+  github:
+    secretName: tekton-git
+
+training:
+  enabled: true
+  schedule: "0 3 * * 0"  # Weekly Sunday 3am UTC
+  accuracyFloor: 0.8
+  github:
+    secretName: tekton-git
+
 jxRequirements:
   ingress:
     domain: ""
