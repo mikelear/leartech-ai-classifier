@@ -51,6 +51,13 @@ eval:
   github:
     secretName: tekton-git
 
+training:
+  enabled: true
+  schedule: "0 3 * * 0"  # Weekly Sunday 3am UTC
+  accuracyFloor: 0.8
+  github:
+    secretName: tekton-git
+
 jxRequirements:
   ingress:
     domain: ""
