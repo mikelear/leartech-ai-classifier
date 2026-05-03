@@ -26,7 +26,7 @@ spec:
           - name: train
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            command: ["/app/.venv/bin/python", "app/cron_train.py"]
+            command: ["/app/.venv/bin/python", "-m", "app.cron_train"]
             args:
             - --endpoint
             - "http://leartech-ai-classifier:8080"

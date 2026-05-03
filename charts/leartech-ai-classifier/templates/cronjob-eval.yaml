@@ -26,7 +26,7 @@ spec:
           - name: eval
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            command: ["/app/.venv/bin/python", "app/cron_eval.py"]
+            command: ["/app/.venv/bin/python", "-m", "app.cron_eval"]
             args:
             - --endpoint
             - {{ .Values.eval.classifierEndpoint | quote }}
