@@ -1,14 +1,11 @@
 replicaCount: 1
-
 image:
-  repository: ""
-  tag: ""
+  repository: "modernburro.azurecr.io/mikelear/leartech-ai-classifier"
+  tag: "0.5.5"
   pullPolicy: IfNotPresent
-
 service:
   type: ClusterIP
   port: 8080
-
 resources:
   requests:
     cpu: 100m
@@ -16,48 +13,41 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
-
 livenessProbe:
   httpGet:
     path: /health
     port: 8080
   initialDelaySeconds: 10
   periodSeconds: 30
-
 readinessProbe:
   httpGet:
     path: /health
     port: 8080
   initialDelaySeconds: 5
   periodSeconds: 10
-
 autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
-
 ingress:
   enabled: true
   host: ""
   tlsSecretName: ""
-
 eval:
   enabled: true
-  schedule: "0 6 * * *"  # Daily 6am UTC
+  schedule: "0 6 * * *" # Daily 6am UTC
   classifierEndpoint: "http://leartech-ai-classifier:8080"
   feedbackRepo: "https://github.com/mikelear/leartech-llm-training-data.git"
   accuracyFloor: 0.8
   github:
     secretName: tekton-git
-
 training:
   enabled: true
-  schedule: "0 3 * * 0"  # Weekly Sunday 3am UTC
+  schedule: "0 3 * * 0" # Weekly Sunday 3am UTC
   accuracyFloor: 0.8
   github:
     secretName: tekton-git
-
 jxRequirements:
   ingress:
     domain: ""
