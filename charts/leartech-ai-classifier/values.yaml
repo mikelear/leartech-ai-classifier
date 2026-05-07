@@ -58,6 +58,24 @@ training:
   github:
     secretName: tekton-git
 
+# Multi-cluster ExternalSecret toggle (auth-service pattern). Each cluster's
+# configs/leartech-ai-classifier.yaml flips externalSecrets.gcp.enabled or
+# externalSecrets.azure.enabled. Default false on both so an unconfigured
+# install doesn't try to materialise tekton-git via the wrong backend.
+#
+# Pre-2026-05-07 the chart hardcoded gcpSecretsManager and silently
+# failed on AZ for ~3 days. This toggle is the durable fix.
+externalSecrets:
+  gcp:
+    enabled: false
+    projectId: product-first
+    tektonGitKey: tf-jx-usable-bird-jx-pipeline-user
+  azure:
+    enabled: false
+    vaultMountPoint: kubernetes
+    vaultRole: jx-vault
+    tektonGitKey: secret/data/jx/pipelineUser
+
 jxRequirements:
   ingress:
     domain: ""
