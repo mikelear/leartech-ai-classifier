@@ -35,6 +35,10 @@ ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
+# CronJob scripts: ML naming idioms (X/X_train), trusted-pod /tmp paths,
+# audited urllib URL opens (controlled endpoints + GitHub API), git-on-PATH
+# subprocess calls, loop counters referenced after the loop.
+"app/cron_*.py" = ["N806", "S108", "S310", "S603", "S607", "B007"]
 
 [tool.ruff.format]
 quote-style = "single"

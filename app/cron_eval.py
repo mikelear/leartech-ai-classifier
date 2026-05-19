@@ -18,6 +18,7 @@ import subprocess
 import sys
 import urllib.request
 from pathlib import Path
+from typing import Any
 
 
 def clone_repo(repo_url: str, target: str) -> bool:
@@ -29,7 +30,7 @@ def clone_repo(repo_url: str, target: str) -> bool:
     return result.returncode == 0
 
 
-def predict(endpoint: str, diff: str) -> dict:
+def predict(endpoint: str, diff: str) -> dict[str, Any]:
     """Call classifier /predict endpoint."""
     payload = json.dumps({'diff': diff}).encode()
     req = urllib.request.Request(
@@ -39,7 +40,8 @@ def predict(endpoint: str, diff: str) -> dict:
         method='POST',
     )
     resp = urllib.request.urlopen(req, timeout=30)
-    return json.loads(resp.read())
+    result: dict[str, Any] = json.loads(resp.read())
+    return result
 
 
 def main() -> None:
@@ -79,8 +81,8 @@ def main() -> None:
         sys.exit(1)
 
     # Simple YAML parsing (avoid pyyaml dependency)
-    test_cases = []
-    current = {}
+    test_cases: list[dict[str, str]] = []
+    current: dict[str, str] = {}
     for line in manifest_path.read_text().splitlines():
         line = line.strip()
         if line.startswith('- file:'):
@@ -157,18 +159,25 @@ def main() -> None:
         reasons.append(f'{len(regressions)} regression(s): {", ".join(regressions)}')
 
     if failed:
-        print(f'\n  EVAL FAILED:')
-        for r in reasons:
-            print(f'    ✗ {r}')
+        print('\n  EVAL FAILED:')
+        for reason in reasons:
+            print(f'    ✗ {reason}')
 
         # Post GitHub Issue if token available
         if token and args.repo:
             _post_issue(token, args.repo, accuracy, regressions, improvements, args.cluster_id)
     else:
-        print(f'\n  EVAL PASSED ✓')
+        print('\n  EVAL PASSED ✓')
 
 
-def _post_issue(token: str, repo: str, accuracy: float, regressions: list, improvements: list, cluster: str) -> None:
+def _post_issue(
+    token: str,
+    repo: str,
+    accuracy: float,
+    regressions: list[str],
+    improvements: list[str],
+    cluster: str,
+) -> None:
     """Post or update a GitHub Issue for eval failures."""
     issue_label = 'eval-regression'
     classifier_repo = 'mikelear/leartech-ai-classifier'
