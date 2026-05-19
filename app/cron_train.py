@@ -15,12 +15,10 @@ Usage:
 import argparse
 import json
 import os
-import pickle
-import re
 import subprocess
 import sys
-import urllib.request
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import torch
@@ -29,8 +27,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from app.features import extract_features_v3, FEATURE_NAMES_V3, PIPELINE_NAMES, PIPELINE_DEFAULTS
-
+from app.features import FEATURE_NAMES_V3, PIPELINE_DEFAULTS, PIPELINE_NAMES, extract_features_v3
 
 HANDCRAFTED_BOOST = 3.0
 
@@ -59,10 +56,10 @@ def load_feedback(feedback_dir: str) -> tuple[list[str], list[float]]:
     return diffs, labels
 
 
-def load_eval_cases(evals_dir: str) -> list[dict]:
+def load_eval_cases(evals_dir: str) -> list[dict[str, Any]]:
     """Load eval test cases."""
-    cases = []
-    current: dict = {}
+    cases: list[dict[str, Any]] = []
+    current: dict[str, Any] = {}
     manifest = Path(evals_dir) / 'manifest.yaml'
     for line in manifest.read_text().splitlines():
         line = line.strip()
@@ -168,10 +165,10 @@ def eval_model(
     model: nn.Sequential,
     tfidf: TfidfVectorizer,
     scaler: StandardScaler,
-    test_cases: list[dict],
+    test_cases: list[dict[str, Any]],
     baseline_path: str,
     accuracy_floor: float,
-) -> tuple[bool, list[dict]]:
+) -> tuple[bool, list[dict[str, Any]]]:
     """Run eval suite. Returns (passed, results)."""
     baseline_map = {}
     if Path(baseline_path).exists():
@@ -328,8 +325,8 @@ def main() -> None:
         json.dump(new_baseline, f, indent=2)
 
     print(f'\n  Saved to {output_dir}:')
-    for f in output_dir.iterdir():
-        print(f'    {f.name} ({f.stat().st_size / 1024:.1f} KB)')
+    for artefact in output_dir.iterdir():
+        print(f'    {artefact.name} ({artefact.stat().st_size / 1024:.1f} KB)')
 
     # TODO: upload to GCS bucket for the service to pick up on restart
     # gsutil cp {output_dir}/* gs://ai-models-product-first/classifier/latest/
