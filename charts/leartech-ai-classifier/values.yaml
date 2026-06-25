@@ -80,3 +80,9 @@ jxRequirements:
   ingress:
     domain: ""
     namespaceSubDomain: ""
+
+# Single-owner-per-cluster for the shared tekton-git secret. Default true keeps
+# backward-compat; set false in a cluster's configs to let the CLUSTER own + replicate
+# tekton-git (no chart owns it) and avoid multi-chart ownership collisions.
+tektonGit:
+  create: true
