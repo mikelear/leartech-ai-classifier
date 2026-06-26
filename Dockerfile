@@ -1,7 +1,7 @@
 # Python service with UV — follows mqube pattern
 # Non-root user, healthcheck, uv run entrypoint
 
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 # git needed by CronJob scripts (clone training data + test cases repos)
 RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
