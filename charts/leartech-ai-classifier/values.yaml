@@ -81,8 +81,12 @@ jxRequirements:
     domain: ""
     namespaceSubDomain: ""
 
-# Single-owner-per-cluster for the shared tekton-git secret. Default true keeps
-# backward-compat; set false in a cluster's configs to let the CLUSTER own + replicate
-# tekton-git (no chart owns it) and avoid multi-chart ownership collisions.
+# Single-owner-per-cluster for the shared tekton-git secret. Default FALSE: the
+# CLUSTER owns tekton-git (the boot's `jx secret replicate` syncs the replica-source
+# ESO ExternalSecret into each namespace, as on Azure) and no chart squats the name.
+# A per-cluster config override (`create: false`) is NOT reliable at the boot's
+# helmfile-template step (chart values.yaml wins there), so the safe single-owner
+# end-state must be the default. Set `create: true` only in a cluster where this
+# chart genuinely must materialise tekton-git itself.
 tektonGit:
-  create: true
+  create: false
